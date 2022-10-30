@@ -1,0 +1,13 @@
+.card__image {
+  height: 300px;
+  width: auto;
+  object-fit: cover;
+}
+
+:root {
+  --bs-body-bg: #e4e9e0;
+}
+
+body {
+  background-color: var(--bs-body-bg);
+}
