@@ -6,9 +6,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="./css/main.css">
+  <link rel="shortcut icon" href="./assets/cat_favicon.png" type="image/x-icon">
   <title>Cat - API</title>
 </head>
 
@@ -32,7 +33,8 @@
       <div class="row">
         <h2>Favourite cats</h2>
       </div>
-      <div class="row g-4" id="favorite-cards"></div>
+      <div class="row g-4" id="favorite-cards">
+      </div>
     </section>
 
     <template id="item-card">
@@ -49,11 +51,30 @@
       </div>
     </template>
 
+    <div class="modal fade" id="appModal" tabindex="-1" aria-labelledby="appModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="appModalLabel">
+              <i class="bi" id="app-modal-icon"></i>
+              <span id="app-modal-title"></span>
+            </h4>
+          </div>
+          <div class="modal-body">
+            <p id="app-modal-message"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal">Ok</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
-  <script src="./js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-    crossorigin="anonymous"></script>
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+  crossorigin="anonymous"></script>
+  <script src="./js/main.js"></script>
 </body>
 
 </html>
