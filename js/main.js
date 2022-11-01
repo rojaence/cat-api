@@ -11,7 +11,7 @@ const appModal = new bootstrap.Modal("#appModal");
 
 getButton.addEventListener("click", async () => {
   await getRandomImages("beng");
-  await getfavourites();
+  await getFavourites();
 });
 
 const getRandomImages = async (breed) => {
@@ -29,7 +29,7 @@ const getRandomImages = async (breed) => {
   }
 };
 
-const getfavourites = async () => {
+const getFavourites = async () => {
   try {
     let paramsObj = { limit: 3, api_key: API_KEY };
     let searchParams = new URLSearchParams(paramsObj);
@@ -48,12 +48,13 @@ const setRandomCards = (data) => {
   data.forEach((item) => {
     let card = cardTemplate.content.cloneNode(true);
     card.querySelector("#cat-picture").src = item.url;
-    card.querySelector("#action-btn").classList.add("btn-success");
+    card.querySelector(".card__action").classList.add("btn-success");
     card.querySelector(".btn__text").textContent = "Add to favourites";
     card
-      .querySelector("#action-btn")
+      .querySelector(".card__action")
       .querySelector("i")
       .classList.add("bi-bookmark-heart");
+    card.querySelector('.card__action').addEventListener('click', () => saveFavourite(item.id));
     fragment.appendChild(card);
   });
   randomSection.appendChild(fragment);
@@ -93,11 +94,11 @@ const setFavoriteCards = (data) => {
   }
   data.forEach((item) => {
     let card = cardTemplate.content.cloneNode(true);
-    card.querySelector("#cat-picture").src = item.url;
-    card.querySelector("#action-btn").classList.add("btn-danger");
+    card.querySelector("#cat-picture").src = item.image.url;
+    card.querySelector(".card__action").classList.add("btn-danger");
     card.querySelector(".btn__text").textContent = "Remove from favourites";
     card
-      .querySelector("#action-btn")
+      .querySelector(".card__action")
       .querySelector("i")
       .classList.add("bi-bookmark-x");
     fragment.appendChild(card);
@@ -105,7 +106,25 @@ const setFavoriteCards = (data) => {
   favouriteSection.appendChild(fragment);
 };
 
+const saveFavourite = async (imageId) => {
+  const postData = { "image_id": imageId };
+  try {
+    const response = await fetch(`${API_URL}/favourites?api_key=${API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    });
+    const resData = await response.json();
+    getFavourites(); 
+  } catch(error) {
+    showAlert(error.message, false);
+    console.log(error);
+  }
+};
+
 window.addEventListener("load", async () => {
   await getRandomImages("beng");
-  await getfavourites();
+  await getFavourites();
 });
