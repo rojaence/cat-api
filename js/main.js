@@ -7,7 +7,13 @@ const favouriteSection = document.querySelector("#favorite-cards");
 const cardTemplate = document.querySelector("#item-card");
 const noFavoriteData = document.createElement("SPAN");
 
+// Modal initialization
 const appModal = new bootstrap.Modal("#appModal");
+let favourites = [];
+
+// Toast initialization
+const toastEl = document.getElementById('app-toast');
+const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
 
 getButton.addEventListener("click", async () => {
   await getRandomImages("beng");
@@ -17,27 +23,44 @@ getButton.addEventListener("click", async () => {
 const getRandomImages = async (breed) => {
   try {
     getButton.setAttribute("disabled", true);
-    let paramsObj = { limit: 3, api_key: API_KEY };
+    let paramsObj = { limit: 3 };
     let searchParams = new URLSearchParams(paramsObj);
-    const response = await fetch(`${API_URL}/images/search?${searchParams}`);
+    const response = await fetch(`${API_URL}/images/search?${searchParams}`, {
+      method: "GET",
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    });
     const data = await response.json();
     getButton.removeAttribute("disabled");
     setRandomCards(data);
   } catch (error) {
-    showAlert(error, false);
+    showAlert({
+      title: 'An error has occurred',
+      message: error.message,
+      success: false,
+    });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
   }
 };
 
 const getFavourites = async () => {
   try {
-    let paramsObj = { limit: 3, api_key: API_KEY };
-    let searchParams = new URLSearchParams(paramsObj);
-    const response = await fetch(`${API_URL}/favourites?${searchParams}`);
+    const response = await fetch(`${API_URL}/favourites`, {
+      method: "GET",
+      headers: {
+        "x-api-key": API_KEY,
+      },
+    });
     const data = await response.json();
+    favourites = data;
     setFavoriteCards(data);
   } catch (error) {
-    showAlert(error, false);
+    showAlert({
+      title: 'An error has occurred',
+      message: error.message,
+      success: false,
+    });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
   }
 };
@@ -54,27 +77,30 @@ const setRandomCards = (data) => {
       .querySelector(".card__action")
       .querySelector("i")
       .classList.add("bi-bookmark-heart");
-    card.querySelector('.card__action').addEventListener('click', () => saveFavourite(item.id));
+    card.querySelector(".card__action").addEventListener("click", () => {
+      saveFavourite(item.id).then;
+    });
     fragment.appendChild(card);
   });
   randomSection.appendChild(fragment);
 };
 
-const showAlert = (message, success) => {
+const showToast = (message) => {
+  toast['_element'].querySelector('.toast-body').textContent = message;
+  toast.show();
+};
+
+const showAlert = ({ title, message, success }) => {
+  appModal["_element"].querySelector("#app-modal-title").textContent =
+    title;
+  appModal["_element"].querySelector("#app-modal-message").textContent =
+    message;
   if (success) {
-    appModal["_element"].querySelector("#app-modal-title").textContent =
-      "Success";
-    appModal["_element"].querySelector("#app-modal-message").textContent =
-      message;
     appModal["_element"].querySelector("#app-modal-icon").className =
       "bi bi-check-circle";
     appModal["_element"].querySelector("#app-modal-icon").style.color =
       "var(--bs-green)";
   } else {
-    appModal["_element"].querySelector("#app-modal-title").textContent =
-      "An error has occurred";
-    appModal["_element"].querySelector("#app-modal-message").textContent =
-      message;
     appModal["_element"].querySelector("#app-modal-icon").className =
       "bi bi-x-circle";
     appModal["_element"].querySelector("#app-modal-icon").style.color =
@@ -101,26 +127,62 @@ const setFavoriteCards = (data) => {
       .querySelector(".card__action")
       .querySelector("i")
       .classList.add("bi-bookmark-x");
+    card.querySelector('.card__action').addEventListener('click', () => removeFavourite(item.id));
     fragment.appendChild(card);
   });
   favouriteSection.appendChild(fragment);
 };
 
 const saveFavourite = async (imageId) => {
-  const postData = { "image_id": imageId };
+  const postData = { image_id: imageId };
   try {
-    const response = await fetch(`${API_URL}/favourites?api_key=${API_KEY}`, {
-      method: 'POST',
+    if (favourites.some(item => item.image.id === imageId)) {
+      showAlert({
+        title: 'Favourites',
+        message: 'This image already exists in favourites',
+        success: true,
+      });
+    } else {
+      const response = await fetch(`${API_URL}/favourites`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": API_KEY,
+        },
+        body: JSON.stringify(postData),
+      });
+      const resData = await response.json();
+      if (resData.message == 'SUCCESS') showToast('Favourite saved');
+      await getFavourites();
+    }
+  } catch (error) {
+    showAlert({
+      title: 'An error has occurred',
+      message: error.message,
+      success: false,
+    });
+    console.log(error);
+  }
+};
+
+const removeFavourite = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/favourites/${id}`, {
+      method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(postData),
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY,
+      }
     });
     const resData = await response.json();
-    getFavourites(); 
+    if (resData.message == 'SUCCESS') showToast('Favourite removed!');
+    await getFavourites();
   } catch(error) {
-    showAlert(error.message, false);
-    console.log(error);
+    showAlert({
+      title: 'Failed to remove favourite',
+      message: error.message,
+      success: false,
+    });
   }
 };
 
