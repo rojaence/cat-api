@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
   <link rel="stylesheet" href="./css/main.css">
   <link rel="shortcut icon" href="./assets/cat_favicon.png" type="image/x-icon">
@@ -16,14 +16,19 @@
 <body>
   <main class="container">
     <h1 class="text-center">The cat API</h1>
-    
     <section class="container mb-4">
       <div class="row g-4 mb-4">
         <div class="col-sm-12 col-md-6">
           <h2 class="text-center">Random cats</h2>
         </div>
         <div class="col-sm-12 col-md-6 text-center">
-          <button class="btn btn-primary" id="get-button">Get random cats</button>
+          <button class="btn btn-primary" id="get-button">
+            Get random cats
+          </button>
+          <button class="btn btn-info" id="upload-button">
+            <i class="bi bi-upload"></i>
+            <span class="btn__text">Upload an image</span>
+          </button>
         </div>
       </div>
       <div class="row g-4" id="random-cards">
@@ -69,7 +74,40 @@
           </div>
         </div>
       </div>
-    </div>  
+    </div>
+
+    <div class="modal fade" id="uploadModal" data-bs-keyboard="false" tabindex="-1" aria-labelledby="uploadingModalLabel">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="uploadingModalLabel">Upload an image</h4>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form id="upload-form">
+              <label for="image-file" class="form-label">Select an image</label>
+              <input type="file" class="form-control" id="image-file" name="file">
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button class="btn btn-primary" id="submit-image">Upload</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="loadingModal" data-bs-backdrop="static">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">Uploading image</div>
+          <div class="modal-body text-center">
+            <span class="spinner-border text-info" style="width: 80px; height: 80px;" role="status"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -85,9 +123,9 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+    crossorigin="anonymous"></script>
   <script src="./js/main.js"></script>
 </body>
 
