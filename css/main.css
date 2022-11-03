@@ -4,6 +4,10 @@
   object-fit: cover;
 }
 
+.navbar-brand {
+  width: 64px;
+}
+
 .toast__icon {
   width: 32px;
   height: 32px;
@@ -15,4 +19,37 @@
 
 body {
   background-color: var(--bs-body-bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.card {
+  animation: fade 0.3s;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.footer {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+}
+.footer .attribution {
+  margin: 0;
+}
+.footer .attribution__link {
+  text-decoration: none;
+  font-weight: bold;
+}
+.footer .attribution__link:hover {
+  color: rgb(93, 109, 103);
 }/*# sourceMappingURL=main.css.map */

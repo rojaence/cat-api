@@ -1,6 +1,11 @@
-const API_URL = "https://api.thecatapi.com/v1";
-const API_KEY =
-  "live_lKsKA11EDjMV9bWOWamMEjtJItkvbba4Rq573imu0QiwSpiwLCd6xAWT7Vmzsikm";
+import {
+  getRandom,
+  getFavourites,
+  getUploaded,
+  saveFavourite,
+  removeFavourite,
+  uploadFile,
+} from "./api.js";
 const getButton = document.getElementById("get-button");
 const randomSection = document.querySelector("#random-cards");
 const favouriteSection = document.querySelector("#favorite-cards");
@@ -8,6 +13,8 @@ const cardTemplate = document.querySelector("#item-card");
 const noFavoriteData = document.createElement("SPAN");
 const uploadButton = document.getElementById("upload-button");
 const form = document.getElementById("upload-form");
+const favouritesButton = document.getElementById("btn-favourites");
+const uploadedButton = document.getElementById("btn-uploaded");
 
 // Modal initialization
 const appModal = new bootstrap.Modal("#appModal");
@@ -22,8 +29,7 @@ const toastEl = document.getElementById("app-toast");
 const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
 
 getButton.addEventListener("click", async () => {
-  await getRandomImages("beng");
-  await getFavourites();
+  await getRandomImages();
 });
 
 uploadButton.addEventListener("click", () => {
@@ -40,18 +46,19 @@ uploadModalEl.addEventListener("hidden.bs.modal", (e) => {
   form.reset();
 });
 
-const getRandomImages = async (breed) => {
+// Events to radio buttons
+uploadedButton.addEventListener("click", () => {
+  getUploadedImages();
+});
+
+favouritesButton.addEventListener("click", () => {
+  getFavouriteImages();
+});
+
+const getRandomImages = async () => {
   try {
     getButton.setAttribute("disabled", true);
-    let paramsObj = { limit: 3 };
-    let searchParams = new URLSearchParams(paramsObj);
-    const response = await fetch(`${API_URL}/images/search?${searchParams}`, {
-      method: "GET",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
-    const data = await response.json();
+    const data = await getRandom();
     getButton.removeAttribute("disabled");
     setRandomCards(data);
   } catch (error) {
@@ -64,15 +71,9 @@ const getRandomImages = async (breed) => {
   }
 };
 
-const getFavourites = async () => {
+const getFavouriteImages = async () => {
   try {
-    const response = await fetch(`${API_URL}/favourites`, {
-      method: "GET",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-    });
-    const data = await response.json();
+    const data = await getFavourites();
     favourites = data;
     setFavoriteCards(data);
   } catch (error) {
@@ -85,12 +86,29 @@ const getFavourites = async () => {
   }
 };
 
+const getUploadedImages = async () => {
+  try {
+    const data = await getUploaded();
+    setUploadedCards(data);
+  } catch (error) {
+    console.log(
+      "🚀 ~ file: main.js ~ line 97 ~ getUploadedImages ~ error",
+      error
+    );
+    showAlert({
+      title: "Error - Get uploaded images",
+      message: error.message,
+      success: false,
+    });
+  }
+};
+
 const setRandomCards = (data) => {
   randomSection.textContent = "";
   let fragment = document.createDocumentFragment();
   data.forEach((item) => {
     let card = cardTemplate.content.cloneNode(true);
-    card.querySelector("#cat-picture").src = item.url;
+    card.querySelector(".card__image").src = item.url;
     card.querySelector(".card__action").classList.add("btn-success");
     card.querySelector(".btn__text").textContent = "Add to favourites";
     card
@@ -98,7 +116,7 @@ const setRandomCards = (data) => {
       .querySelector("i")
       .classList.add("bi-bookmark-heart");
     card.querySelector(".card__action").addEventListener("click", () => {
-      saveFavourite(item.id).then;
+      saveFavouriteImage(item.id);
     });
     fragment.appendChild(card);
   });
@@ -139,7 +157,7 @@ const setFavoriteCards = (data) => {
   }
   data.forEach((item) => {
     let card = cardTemplate.content.cloneNode(true);
-    card.querySelector("#cat-picture").src = item.image.url;
+    card.querySelector(".card__image").src = item.image.url;
     card.querySelector(".card__action").classList.add("btn-danger");
     card.querySelector(".btn__text").textContent = "Remove from favourites";
     card
@@ -148,14 +166,13 @@ const setFavoriteCards = (data) => {
       .classList.add("bi-bookmark-x");
     card
       .querySelector(".card__action")
-      .addEventListener("click", () => removeFavourite(item.id));
+      .addEventListener("click", () => removeFavouriteImage(item.id));
     fragment.appendChild(card);
   });
   favouriteSection.appendChild(fragment);
 };
 
-const saveFavourite = async (imageId) => {
-  const postData = { image_id: imageId };
+const saveFavouriteImage = async (imageId) => {
   try {
     if (favourites.some((item) => item.image.id === imageId)) {
       showAlert({
@@ -164,17 +181,9 @@ const saveFavourite = async (imageId) => {
         success: true,
       });
     } else {
-      const response = await fetch(`${API_URL}/favourites`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": API_KEY,
-        },
-        body: JSON.stringify(postData),
-      });
-      const resData = await response.json();
+      const resData = await saveFavourite(imageId);
       if (resData.message == "SUCCESS") showToast("Favourite saved");
-      await getFavourites();
+      await getFavouriteImages();
     }
   } catch (error) {
     showAlert({
@@ -186,18 +195,37 @@ const saveFavourite = async (imageId) => {
   }
 };
 
-const removeFavourite = async (id) => {
+const setUploadedCards = (data) => {
+  favouriteSection.textContent = "";
+  let fragment = document.createDocumentFragment();
+  if (data.length === 0) {
+    noFavoriteData.className = "col text-center p-4";
+    noFavoriteData.textContent = "No uploaded images";
+    favouriteSection.appendChild(noFavoriteData);
+    return;
+  }
+  data.forEach((item) => {
+    let card = cardTemplate.content.cloneNode(true);
+    card.querySelector(".card__image").src = item.url;
+    card.querySelector(".card__action").classList.add("btn-danger");
+    card.querySelector(".btn__text").textContent = "Delete image";
+    card
+      .querySelector(".card__action")
+      .querySelector("i")
+      .classList.add("bi-x-circle");
+    card
+      .querySelector(".card__action")
+      .addEventListener("click", () => console.log(item));
+    fragment.appendChild(card);
+  });
+  favouriteSection.appendChild(fragment);
+};
+
+const removeFavouriteImage = async (id) => {
   try {
-    const response = await fetch(`${API_URL}/favourites/${id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY,
-      },
-    });
-    const resData = await response.json();
+    const resData = await removeFavourite(id);
     if (resData.message == "SUCCESS") showToast("Favourite removed!");
-    await getFavourites();
+    await getFavouriteImages();
   } catch (error) {
     showAlert({
       title: "Failed to remove favourite",
@@ -213,31 +241,17 @@ const uploadImage = async () => {
     if (
       formData.get("file").size === 0 ||
       !formData.get("file").type.includes("image")
-    )
+    ) {
       return;
+    }
     uploadModal.hide();
     loadingModal.show();
-    const response = await fetch(`${API_URL}/images/upload`, {
-      method: "POST",
-      headers: {
-        "x-api-key": API_KEY,
-      },
-      body: formData,
-    });
-    const resData = await response.json();
+    const resData = await uploadFile(formData);
     loadingModal.hide();
-    if (response.status === 201) showToast("Image uploaded successfully");
-    else {
-      showAlert({
-        title: "Failed to upload image",
-        message: `${response.status}: ${resData.message}`,
-        success: false,
-      });
-    }
   } catch (error) {
-    console.log("🚀 ~ file: main.js ~ line 238 ~ uploadImage ~ error", error)
+    console.log("🚀 ~ file: main.js ~ line 238 ~ uploadImage ~ error", error);
     showAlert({
-      title: "An error has occurred",
+      title: "Failed to upload image",
       message: error.message,
       success: false,
     });
@@ -246,9 +260,7 @@ const uploadImage = async () => {
   }
 };
 
-
-
 window.addEventListener("load", async () => {
-  await getRandomImages("beng");
-  await getFavourites();
+  await getRandomImages();
+  await getFavouriteImages();
 });
