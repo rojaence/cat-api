@@ -1,10 +1,11 @@
+import * as bootstrap from "bootstrap";
 import {
   getRandom,
   getFavourites,
-  getUploaded,
   saveFavourite,
   removeFavourite,
   uploadFile,
+  getAnalysis
 } from "./api.js";
 const getButton = document.getElementById("get-button");
 const randomSection = document.querySelector("#random-cards");
@@ -13,8 +14,6 @@ const cardTemplate = document.querySelector("#item-card");
 const noFavoriteData = document.createElement("SPAN");
 const uploadButton = document.getElementById("upload-button");
 const form = document.getElementById("upload-form");
-const favouritesButton = document.getElementById("btn-favourites");
-const uploadedButton = document.getElementById("btn-uploaded");
 
 // Modal initialization
 const appModal = new bootstrap.Modal("#appModal");
@@ -46,15 +45,6 @@ uploadModalEl.addEventListener("hidden.bs.modal", (e) => {
   form.reset();
 });
 
-// Events to radio buttons
-uploadedButton.addEventListener("click", () => {
-  getUploadedImages();
-});
-
-favouritesButton.addEventListener("click", () => {
-  getFavouriteImages();
-});
-
 const getRandomImages = async () => {
   try {
     getButton.setAttribute("disabled", true);
@@ -75,6 +65,7 @@ const getFavouriteImages = async () => {
   try {
     const data = await getFavourites();
     favourites = data;
+    console.log("🚀 ~ file: main.js ~ line 79 ~ getFavouriteImages ~ favourites", favourites)
     setFavoriteCards(data);
   } catch (error) {
     showAlert({
@@ -83,23 +74,6 @@ const getFavouriteImages = async () => {
       success: false,
     });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
-  }
-};
-
-const getUploadedImages = async () => {
-  try {
-    const data = await getUploaded();
-    setUploadedCards(data);
-  } catch (error) {
-    console.log(
-      "🚀 ~ file: main.js ~ line 97 ~ getUploadedImages ~ error",
-      error
-    );
-    showAlert({
-      title: "Error - Get uploaded images",
-      message: error.message,
-      success: false,
-    });
   }
 };
 
@@ -195,7 +169,7 @@ const saveFavouriteImage = async (imageId) => {
   }
 };
 
-const setUploadedCards = (data) => {
+/* const setUploadedCards = (data) => {
   favouriteSection.textContent = "";
   let fragment = document.createDocumentFragment();
   if (data.length === 0) {
@@ -215,11 +189,11 @@ const setUploadedCards = (data) => {
       .classList.add("bi-x-circle");
     card
       .querySelector(".card__action")
-      .addEventListener("click", () => console.log(item));
+      .addEventListener("click", () => getImageAnalysis(item.id).then(res => console.log(res)));
     fragment.appendChild(card);
   });
   favouriteSection.appendChild(fragment);
-};
+}; */
 
 const removeFavouriteImage = async (id) => {
   try {
@@ -247,7 +221,10 @@ const uploadImage = async () => {
     uploadModal.hide();
     loadingModal.show();
     const resData = await uploadFile(formData);
+    await saveFavourite(resData.id);
+    await getFavouriteImages();
     loadingModal.hide();
+    showToast('Image saved successfully');
   } catch (error) {
     console.log("🚀 ~ file: main.js ~ line 238 ~ uploadImage ~ error", error);
     showAlert({
@@ -257,6 +234,20 @@ const uploadImage = async () => {
     });
   } finally {
     loadingModal.hide();
+  }
+};
+
+const getImageAnalysis = async (imageId) => {
+  try {
+    const data = await getAnalysis(imageId); 
+    return data;
+  } catch(error) {
+    console.log("🚀 ~ file: main.js ~ line 268 ~ getImageAnalysis ~ error", error)
+    showAlert({
+      title: 'Error - Get Image Analysis',
+      message: error.message,
+      success: false,
+    });
   }
 };
 

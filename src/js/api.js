@@ -26,19 +26,8 @@ const getFavourites = async () => {
   return data;
 };
 
-const getUploaded = async () => {
-  const response = await fetch(`${API_URL}/images`, {
-    method: "GET",
-    headers: {
-      "x-api-key": API_KEY,
-    },
-  });
-  const data = await response.json();
-  return data;
-};
-
 const saveFavourite = async (imageId) => {
-  const postData = { image_id: imageId };
+  const postData = { 'image_id': imageId };
   const response = await fetch(`${API_URL}/favourites`, {
     method: "POST",
     headers: {
@@ -75,11 +64,22 @@ const uploadFile = async (file) => {
   return data;
 };
 
+const getAnalysis = async (id) => {
+  const response = await fetch(`${API_URL}/images/${id}/analysis`, {
+    method: 'GET',
+    headers: {
+      "x-api-key": API_KEY
+    }
+  });
+  const data = await response.json();
+  return data;
+}
+
 export {
   getRandom,
   getFavourites,
-  getUploaded,
   saveFavourite,
   removeFavourite,
   uploadFile,
+  getAnalysis
 };

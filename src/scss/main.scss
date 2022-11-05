@@ -1,3 +1,6 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons.css";
+
 .card__image {
   height: 300px;
   width: auto;
@@ -28,6 +31,21 @@ body {
 
 .card {
   animation: fade .3s;
+  position: relative;
+  &-body {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+  &__action {
+    opacity: 0;
+    transition: opacity .2s;
+  }
+  &:hover {
+    .card__action {
+      opacity: 1;
+    }
+  }
 }
 
 @keyframes fade {
@@ -57,3 +75,9 @@ body {
   }
 }
 
+$bg-blur-values: 75, 50, 25, 10;  
+@each $size in $bg-blur-values {
+  .bg-blur-#{$size} {
+    backdrop-filter: blur(#{$size}px);
+  }
+}

@@ -26,6 +26,19 @@ body {
 
 .card {
   animation: fade 0.3s;
+  position: relative;
+}
+.card-body {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+.card__action {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.card:hover .card__action {
+  opacity: 1;
 }
 
 @keyframes fade {
@@ -52,4 +65,20 @@ body {
 }
 .footer .attribution__link:hover {
   color: rgb(93, 109, 103);
+}
+
+.bg-blur-75 {
+  backdrop-filter: blur(75px);
+}
+
+.bg-blur-50 {
+  backdrop-filter: blur(50px);
+}
+
+.bg-blur-25 {
+  backdrop-filter: blur(25px);
+}
+
+.bg-blur-10 {
+  backdrop-filter: blur(10px);
 }/*# sourceMappingURL=main.css.map */
