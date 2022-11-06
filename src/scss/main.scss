@@ -8,7 +8,19 @@
 }
 
 .navbar-brand {
-  width: 64px;
+  width: 48px;
+}
+
+.favourite-bar {
+  position: sticky;
+  top: 74px;
+  z-index: 80;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .toast {
@@ -72,6 +84,18 @@ body {
         color: rgb(93, 109, 103);
       }
     }
+  }
+}
+
+.upload-preview {
+  height: 200px;
+  width: 200px;
+  object-fit: contain;
+  display: block;
+  margin: 1rem auto 0;
+  @media screen and (min-width: 600px) { 
+    height: 300px;
+    width: 300px;
   }
 }
 

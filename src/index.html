@@ -11,13 +11,16 @@
 </head>
 
 <body>
-  <header class="mb-4">
+  <header class="mb-4 sticky-top">
     <nav class="navbar bg-secondary px-4">
       <div class="container-fluid">
-        <h1 class="text-center text-light m-0">
+        <h1 class="text-light m-0 app-title">
           <img src="./assets/cat_favicon.png" class="navbar-brand" alt="Icon">
-          TheCatApi
+          Cat - API
         </h1>
+        <a href="https://github.com/rojaence" target="_blank" title="Github repo">
+          <i class="bi bi-github text-light" style="font-size: 2rem;"></i>
+        </a>
       </div>
     </nav>
   </header>
@@ -38,12 +41,17 @@
       </div>
     </section>
 
-    <section class="container mt-4">
-      <div class="row sticky-top align-items-center justify-content-between p-2 py-3 mb-3 bg-light bg-opacity-75 rounded bg-blur-25"> 
-        <div class="col col-sm-12 col-md-4">
-          <h2 class="text-center m-0">Favourite cats</h2>
+    <section class="container mt-4 cats">
+      <div class="favourite-bar row align-items-center justify-content-between p-2 mb-3 bg-light bg-opacity-75 rounded bg-blur-25"> 
+        <div class="col-1 text-md-center">
+          <button class="btn bg-transparent" id="refresh-favourites" title="Refresh">
+            <i class="bi bi-arrow-clockwise" style="font-size: 1.5rem;"></i>
+          </button>
         </div>
-        <div class="col col-sm-12 col-md-4 text-center">
+        <div class="col-10 col-sm-7">
+          <h2 class="text-start m-0">Favourite cats</h2>
+        </div>
+        <div class="col-12 col-sm-4 text-end text-md-center">
           <button class="btn btn-info" id="upload-button">
             <i class="bi bi-upload"></i>
             <span class="btn__text">Upload an image</span>
@@ -56,10 +64,10 @@
 
     <template id="item-card">
       <div class="col-sm-12 col-md-6 col-lg-4">
-        <article class="card bg-transparent">
+        <article class="card bg-transparent border-0">
           <img class="card__image card-img" alt="cat picture">
           <div class="card-body text-end card__body">
-            <button class="btn card__action">
+            <button class="btn card__action" data-bs-custom-class="app-tooltip">
               <i class="bi"></i>
               <span class="btn__text"></span>
             </button>
@@ -99,6 +107,7 @@
               <label for="image-file" class="form-label">Select an image</label>
               <input type="file" class="form-control" id="image-file" name="file">
             </form>
+            <img src="./assets/imageIcon.svg" class="upload-preview" id="upload-preview">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -141,5 +150,4 @@
   </footer>
   <script src="./js/main.js" type="module"></script>
 </body>
-
 </html>

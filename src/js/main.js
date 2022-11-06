@@ -1,11 +1,12 @@
 import * as bootstrap from "bootstrap";
+const imageIcon = new URL('../assets/imageIcon.svg', import.meta.url);
+
 import {
   getRandom,
   getFavourites,
   saveFavourite,
   removeFavourite,
   uploadFile,
-  getAnalysis
 } from "./api.js";
 const getButton = document.getElementById("get-button");
 const randomSection = document.querySelector("#random-cards");
@@ -14,6 +15,8 @@ const cardTemplate = document.querySelector("#item-card");
 const noFavoriteData = document.createElement("SPAN");
 const uploadButton = document.getElementById("upload-button");
 const form = document.getElementById("upload-form");
+const imageInput = document.getElementById('image-file');
+const imagePreview = document.getElementById('upload-preview');
 
 // Modal initialization
 const appModal = new bootstrap.Modal("#appModal");
@@ -35,6 +38,19 @@ uploadButton.addEventListener("click", () => {
   uploadModal.show();
 });
 
+imageInput.addEventListener('change', (e) => {
+  if (e.target.files[0] && e.target.files[0].type.includes('image')) {
+    const file = e.target.files[0];
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.addEventListener('load', (e) => {
+      imagePreview.setAttribute('src', e.target.result);
+    });
+  } else {
+    imagePreview.setAttribute('src', imageIcon);
+  }
+});
+
 uploadModal["_element"]
   .querySelector("#submit-image")
   .addEventListener("click", () => {
@@ -43,6 +59,7 @@ uploadModal["_element"]
 
 uploadModalEl.addEventListener("hidden.bs.modal", (e) => {
   form.reset();
+  imagePreview.setAttribute('src', imageIcon);
 });
 
 const getRandomImages = async () => {
@@ -65,7 +82,6 @@ const getFavouriteImages = async () => {
   try {
     const data = await getFavourites();
     favourites = data;
-    console.log("🚀 ~ file: main.js ~ line 79 ~ getFavouriteImages ~ favourites", favourites)
     setFavoriteCards(data);
   } catch (error) {
     showAlert({
@@ -75,26 +91,6 @@ const getFavouriteImages = async () => {
     });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
   }
-};
-
-const setRandomCards = (data) => {
-  randomSection.textContent = "";
-  let fragment = document.createDocumentFragment();
-  data.forEach((item) => {
-    let card = cardTemplate.content.cloneNode(true);
-    card.querySelector(".card__image").src = item.url;
-    card.querySelector(".card__action").classList.add("btn-success");
-    card.querySelector(".btn__text").textContent = "Add to favourites";
-    card
-      .querySelector(".card__action")
-      .querySelector("i")
-      .classList.add("bi-bookmark-heart");
-    card.querySelector(".card__action").addEventListener("click", () => {
-      saveFavouriteImage(item.id);
-    });
-    fragment.appendChild(card);
-  });
-  randomSection.appendChild(fragment);
 };
 
 const showToast = (message) => {
@@ -119,6 +115,25 @@ const showAlert = ({ title, message, success }) => {
   }
   appModal.show();
 };
+const setRandomCards = (data) => {
+  randomSection.textContent = "";
+  let fragment = document.createDocumentFragment();
+  data.forEach((item) => {
+    let card = cardTemplate.content.cloneNode(true);
+    card.querySelector(".card__image").src = item.url;
+    card.querySelector(".card__action").classList.add("btn-success");
+    card.querySelector(".card__action").setAttribute('title', 'Add to favourites');
+    card
+      .querySelector(".card__action")
+      .querySelector("i")
+      .classList.add("bi-bookmark-heart");
+    card.querySelector(".card__action").addEventListener("click", () => {
+      saveFavouriteImage(item.id);
+    });
+    fragment.appendChild(card);
+  });
+  randomSection.appendChild(fragment);
+};
 
 const setFavoriteCards = (data) => {
   favouriteSection.textContent = "";
@@ -133,7 +148,7 @@ const setFavoriteCards = (data) => {
     let card = cardTemplate.content.cloneNode(true);
     card.querySelector(".card__image").src = item.image.url;
     card.querySelector(".card__action").classList.add("btn-danger");
-    card.querySelector(".btn__text").textContent = "Remove from favourites";
+    card.querySelector(".card__action").setAttribute('title', 'Remove to favourites');
     card
       .querySelector(".card__action")
       .querySelector("i")
@@ -168,32 +183,6 @@ const saveFavouriteImage = async (imageId) => {
     console.log(error);
   }
 };
-
-/* const setUploadedCards = (data) => {
-  favouriteSection.textContent = "";
-  let fragment = document.createDocumentFragment();
-  if (data.length === 0) {
-    noFavoriteData.className = "col text-center p-4";
-    noFavoriteData.textContent = "No uploaded images";
-    favouriteSection.appendChild(noFavoriteData);
-    return;
-  }
-  data.forEach((item) => {
-    let card = cardTemplate.content.cloneNode(true);
-    card.querySelector(".card__image").src = item.url;
-    card.querySelector(".card__action").classList.add("btn-danger");
-    card.querySelector(".btn__text").textContent = "Delete image";
-    card
-      .querySelector(".card__action")
-      .querySelector("i")
-      .classList.add("bi-x-circle");
-    card
-      .querySelector(".card__action")
-      .addEventListener("click", () => getImageAnalysis(item.id).then(res => console.log(res)));
-    fragment.appendChild(card);
-  });
-  favouriteSection.appendChild(fragment);
-}; */
 
 const removeFavouriteImage = async (id) => {
   try {
@@ -234,20 +223,6 @@ const uploadImage = async () => {
     });
   } finally {
     loadingModal.hide();
-  }
-};
-
-const getImageAnalysis = async (imageId) => {
-  try {
-    const data = await getAnalysis(imageId); 
-    return data;
-  } catch(error) {
-    console.log("🚀 ~ file: main.js ~ line 268 ~ getImageAnalysis ~ error", error)
-    showAlert({
-      title: 'Error - Get Image Analysis',
-      message: error.message,
-      success: false,
-    });
   }
 };
 

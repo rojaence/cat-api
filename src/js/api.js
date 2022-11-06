@@ -64,22 +64,10 @@ const uploadFile = async (file) => {
   return data;
 };
 
-const getAnalysis = async (id) => {
-  const response = await fetch(`${API_URL}/images/${id}/analysis`, {
-    method: 'GET',
-    headers: {
-      "x-api-key": API_KEY
-    }
-  });
-  const data = await response.json();
-  return data;
-}
-
 export {
   getRandom,
   getFavourites,
   saveFavourite,
   removeFavourite,
   uploadFile,
-  getAnalysis
 };
