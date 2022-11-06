@@ -17,6 +17,7 @@ const uploadButton = document.getElementById("upload-button");
 const form = document.getElementById("upload-form");
 const imageInput = document.getElementById('image-file');
 const imagePreview = document.getElementById('upload-preview');
+const refreshFavouriteBtn = document.getElementById('refresh-favourites');
 
 // Modal initialization
 const appModal = new bootstrap.Modal("#appModal");
@@ -37,6 +38,10 @@ getButton.addEventListener("click", async () => {
 uploadButton.addEventListener("click", () => {
   uploadModal.show();
 });
+
+refreshFavouriteBtn.addEventListener('click', async () => {
+  await getFavouriteImages();
+}); 
 
 imageInput.addEventListener('change', (e) => {
   if (e.target.files[0] && e.target.files[0].type.includes('image')) {
@@ -66,7 +71,6 @@ const getRandomImages = async () => {
   try {
     getButton.setAttribute("disabled", true);
     const data = await getRandom();
-    getButton.removeAttribute("disabled");
     setRandomCards(data);
   } catch (error) {
     showAlert({
@@ -75,11 +79,14 @@ const getRandomImages = async () => {
       success: false,
     });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
+  } finally {
+    getButton.removeAttribute("disabled");
   }
 };
 
 const getFavouriteImages = async () => {
   try {
+    refreshFavouriteBtn.setAttribute('disabled', true);
     const data = await getFavourites();
     favourites = data;
     setFavoriteCards(data);
@@ -90,6 +97,8 @@ const getFavouriteImages = async () => {
       success: false,
     });
     console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
+  } finally {
+    refreshFavouriteBtn.removeAttribute("disabled");
   }
 };
 
@@ -126,7 +135,7 @@ const setRandomCards = (data) => {
     card
       .querySelector(".card__action")
       .querySelector("i")
-      .classList.add("bi-bookmark-heart");
+      .classList.add("bi-heart");
     card.querySelector(".card__action").addEventListener("click", () => {
       saveFavouriteImage(item.id);
     });
@@ -152,7 +161,7 @@ const setFavoriteCards = (data) => {
     card
       .querySelector(".card__action")
       .querySelector("i")
-      .classList.add("bi-bookmark-x");
+      .classList.add("bi-x-lg");
     card
       .querySelector(".card__action")
       .addEventListener("click", () => removeFavouriteImage(item.id));
