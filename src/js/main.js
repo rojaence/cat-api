@@ -1,4 +1,6 @@
 import * as bootstrap from "bootstrap";
+import Viewer from "viewerjs";
+import 'viewerjs/dist/viewer.css';
 const imageIcon = new URL('../assets/imageIcon.svg', import.meta.url);
 
 import {
@@ -30,6 +32,12 @@ const loadingModal = new bootstrap.Modal("#loadingModal");
 // Toast initialization
 const toastEl = document.getElementById("app-toast");
 const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
+
+// Viewer js initialziation
+/* const viewer = new Viewer(document.getElementById('image-viewer'), {
+  
+}); */
+let randomGallery, favouriteGallery;
 
 getButton.addEventListener("click", async () => {
   await getRandomImages();
@@ -67,11 +75,22 @@ uploadModalEl.addEventListener("hidden.bs.modal", (e) => {
   imagePreview.setAttribute('src', imageIcon);
 });
 
+const setRandomGallery = () => {
+  if (randomGallery) randomGallery.destroy();
+  randomGallery = new Viewer(randomSection);
+};
+
+const setFavouriteGallery = () => {
+  if (favouriteGallery) favouriteGallery.destroy();
+  favouriteGallery = new Viewer(favouriteSection);
+};
+
 const getRandomImages = async () => {
   try {
     getButton.setAttribute("disabled", true);
     const data = await getRandom();
     setRandomCards(data);
+    setRandomGallery();
   } catch (error) {
     showAlert({
       title: "An error has occurred",
@@ -90,6 +109,7 @@ const getFavouriteImages = async () => {
     const data = await getFavourites();
     favourites = data;
     setFavoriteCards(data);
+    setFavouriteGallery();
   } catch (error) {
     showAlert({
       title: "An error has occurred",

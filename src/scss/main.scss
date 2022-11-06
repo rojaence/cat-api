@@ -58,6 +58,9 @@ body {
       opacity: 1;
     }
   }
+  &__image {
+    cursor: zoom-in;
+  }
 }
 
 @keyframes fade {
