@@ -2,6 +2,8 @@ import * as bootstrap from "bootstrap";
 import Viewer from "viewerjs";
 import 'viewerjs/dist/viewer.css';
 const imageIcon = new URL('../assets/imageIcon.svg', import.meta.url);
+const saveTasks = [];
+const removeTasks = [];
 
 import {
   getRandom,
@@ -34,9 +36,6 @@ const toastEl = document.getElementById("app-toast");
 const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
 
 // Viewer js initialziation
-/* const viewer = new Viewer(document.getElementById('image-viewer'), {
-  
-}); */
 let randomGallery, favouriteGallery;
 
 getButton.addEventListener("click", async () => {
@@ -97,7 +96,6 @@ const getRandomImages = async () => {
       message: error.message,
       success: false,
     });
-    console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
   } finally {
     getButton.removeAttribute("disabled");
   }
@@ -116,7 +114,6 @@ const getFavouriteImages = async () => {
       message: error.message,
       success: false,
     });
-    console.log("🚀 ~ file: main.js ~ line 10 ~ getImageUrl ~ error", error);
   } finally {
     refreshFavouriteBtn.removeAttribute("disabled");
   }
@@ -177,7 +174,7 @@ const setFavoriteCards = (data) => {
     let card = cardTemplate.content.cloneNode(true);
     card.querySelector(".card__image").src = item.image.url;
     card.querySelector(".card__action").classList.add("btn-danger");
-    card.querySelector(".card__action").setAttribute('title', 'Remove to favourites');
+    card.querySelector(".card__action").setAttribute('title', 'Remove from favourites');
     card
       .querySelector(".card__action")
       .querySelector("i")
@@ -191,6 +188,7 @@ const setFavoriteCards = (data) => {
 };
 
 const saveFavouriteImage = async (imageId) => {
+  if (saveTasks.includes(imageId)) return;
   try {
     if (favourites.some((item) => item.image.id === imageId)) {
       showAlert({
@@ -199,9 +197,12 @@ const saveFavouriteImage = async (imageId) => {
         success: true,
       });
     } else {
+      saveTasks.push(imageId);
       const resData = await saveFavourite(imageId);
       if (resData.message == "SUCCESS") showToast("Favourite saved");
       await getFavouriteImages();
+      let index = saveTasks.indexOf(imageId);
+      saveTasks.splice(index, 1);
     }
   } catch (error) {
     showAlert({
@@ -214,10 +215,14 @@ const saveFavouriteImage = async (imageId) => {
 };
 
 const removeFavouriteImage = async (id) => {
+  if (removeTasks.includes(id)) return;
   try {
+    removeTasks.push(id);
     const resData = await removeFavourite(id);
     if (resData.message == "SUCCESS") showToast("Favourite removed!");
     await getFavouriteImages();
+    let index = removeTasks.indexOf(id);
+    removeTasks.splice(index, 1);
   } catch (error) {
     showAlert({
       title: "Failed to remove favourite",
@@ -244,7 +249,6 @@ const uploadImage = async () => {
     loadingModal.hide();
     showToast('Image saved successfully');
   } catch (error) {
-    console.log("🚀 ~ file: main.js ~ line 238 ~ uploadImage ~ error", error);
     showAlert({
       title: "Failed to upload image",
       message: error.message,
