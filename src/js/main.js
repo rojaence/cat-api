@@ -36,7 +36,7 @@ const toastEl = document.getElementById("app-toast");
 const toast = new bootstrap.Toast(toastEl, { delay: 4000 });
 
 // Viewer js initialziation
-let randomGallery, favouriteGallery;
+let randomGallery, favouriteGallery, previewViewer;
 
 getButton.addEventListener("click", async () => {
   await getRandomImages();
@@ -57,9 +57,11 @@ imageInput.addEventListener('change', (e) => {
     fileReader.readAsDataURL(file);
     fileReader.addEventListener('load', (e) => {
       imagePreview.setAttribute('src', e.target.result);
+      setPreviewViewer(true);
     });
   } else {
     imagePreview.setAttribute('src', imageIcon);
+    setPreviewViewer(false);
   }
 });
 
@@ -72,6 +74,7 @@ uploadModal["_element"]
 uploadModalEl.addEventListener("hidden.bs.modal", (e) => {
   form.reset();
   imagePreview.setAttribute('src', imageIcon);
+  setPreviewViewer(false);
 });
 
 const setRandomGallery = () => {
@@ -82,6 +85,11 @@ const setRandomGallery = () => {
 const setFavouriteGallery = () => {
   if (favouriteGallery) favouriteGallery.destroy();
   favouriteGallery = new Viewer(favouriteSection);
+};
+
+const setPreviewViewer = (selected) => {
+  if (previewViewer) previewViewer.destroy();
+  if (selected) previewViewer = new Viewer(uploadModalEl);
 };
 
 const getRandomImages = async () => {
