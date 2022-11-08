@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "parcel ./src/index.html",
     "prebuild": "npx rimraf build",
-    "build": "parcel build --public-url ./cat-api/ ./src/index.html"
+    "build": "parcel build --public-url ./ ./src/index.html"
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.7.0",
